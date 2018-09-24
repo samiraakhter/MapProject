@@ -1,0 +1,65 @@
+﻿
+@{
+    ViewBag.Title = "GetMarker";
+}
+<head>
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+</head>
+
+<div class="well">
+    <input id="btnLoadMarker" class="btn btn-success" type="button" value="Load Markers" />
+
+    <div id="divData" class="well hidden">
+        <table class="table table-bordered" id="tblData">
+            <thead>
+                <tr class="success">
+                    <td>markerID</td>
+                    <td>Longitude</td>
+                    <td>Latitude</td>
+                    <td>markerName</td>
+                    <td>Description</td>
+                    <td>CreatedBy</td>
+                    <td>CreatedDate</td>
+                    <td>isActive</td>
+                    <td>UpdatedDate</td>
+                    <td>UpdatedBy</td>
+                </tr>
+            </thead>
+            <tbody id="tblBody"></tbody>
+        </table>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#btnLoadMarker').click(function () {
+            $.ajax({
+                url: '/api/Map/Get',
+                method: 'GET',
+
+                success: function (data) {
+                    $('#divData').removeClass('hidden');
+                    $('#tblBody').empty();
+                    $.each(data, function (index, value) {
+                        var row = $('<tr><td>' + value.markerID + '</td><td>'
+                            + value.Longitude + '</td><td>'
+                            + value.Latitude + '</td><td>'
+                            + value.markerName + '</td><td>'
+                            + value.Description + '</td><td>'
+                            + value.CreatedBy + '</td><td>'
+                            + value.CreatedDate + '</td><td>'
+                            + value.isActive + '</td><td>'
+                            + value.UpdatedDate + '</td><td>'
+                            + value.UpdatedBy + '</td></tr>');
+                        $('#tblData').append(row);
+                    });
+                }
+            });
+        });
+    });
+</script>

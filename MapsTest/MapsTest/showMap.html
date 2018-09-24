@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHfjgq0IzohNbvcZwZGl85TYjhlXe8Xpw&sensor=false">
+    </script>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places">
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(success);
+            } else {
+                alert("Geo Location is not supported on your current browser!");
+            }
+            function success(position) {
+                var lat = position.coords.latitude;
+                var long = position.coords.longitude;
+                var city = position.coords.locality;
+                var myLatlng = new google.maps.LatLng(lat, long);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: '/api/Map/saveMarker',
+
+                    data: {
+                        Longitude: long,
+                        Latitude: lat,
+                        Description: city,
+                        markerName : "abc",
+
+                    },
+                    success: function () {
+                        alert("Done");
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+                var myOptions = {
+                    center: myLatlng,
+                    zoom: 14,
+                    disableDoubleClickZoom: true,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+                addMarker(map, myLatlng, "Hello", "You Clicked on Marker");
+                poly = new google.maps.Polyline({
+                    strokeColor: 'red',
+
+                });
+                poly.setMap(map);
+
+                // Add a listener for the click event
+                map.addListener('click', addLatLng);
+
+
+            }
+
+            // Handles click events on a map, and adds a new point to the Polyline.
+            function addLatLng(event) {
+                var path = poly.getPath();
+
+                // Because path is an MVCArray, we can simply append a new coordinate
+                // and it will automatically appear.
+                path.push(event.latLng);
+
+            }
+
+            function addMarker(map, myLatlng, title, content) {
+                var markerOptn = {
+                    position: myLatlng,
+                    map: map,
+                    title: title,
+
+                };
+
+                var marker = new google.maps.Marker(markerOptn);
+                var infoWindow = new google.maps.InfoWindow({ content: content, position: myLatlng });
+
+                google.maps.event.addListener(marker, "click", function () {
+                    infoWindow.open(map)
+                });
+
+                google.maps.event.addListener(map, 'click', function (event) {
+                    new google.maps.InfoWindow({
+                        position: event.latLng,
+                        content: event.latLng.toString()
+                    }).open(map);
+                });
+
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div id="map_canvas" style="width: 500px; height: 400px">
+
+        </div>
+
+        <p id="map"></p>
+    </form>
+</body>
+</html>
